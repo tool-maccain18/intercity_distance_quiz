@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>都市間距離クイズ（2モード）</title>
+
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#121b2f;
+      --line:rgba(255,255,255,.08);
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --ok:#34d399;
+      --ng:#fb7185;
+      --accent:rgba(96,165,250,.22);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
+      background: radial-gradient(1200px 800px at 20% -10%, rgba(96,165,250,.18), transparent 60%),
+                  radial-gradient(900px 600px at 90% 10%, rgba(52,211,153,.10), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+    }
+    .wrap{max-width:1040px; margin:0 auto; padding:24px;}
+    header{display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:16px;}
+    h1{font-size:22px; margin:0;}
+    .sub{color:var(--muted); font-size:13px; margin-top:6px; line-height:1.6}
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+
+    .controls{
+      display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end;
+      margin-bottom:12px;
+    }
+    .control{min-width:220px; flex:1;}
+    label{display:block; font-size:12px; color:var(--muted); margin:0 0 6px 2px;}
+    select{
+      width:100%;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background: rgba(15, 23, 42, .85);
+      color:var(--text);
+      outline:none;
+    }
+
+    .question{font-size:18px; margin:8px 0 14px 0; line-height:1.45;}
+    .badge{
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:12px; padding:6px 10px; border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      color:var(--muted);
+    }
+
+    .options{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:12px;
+    }
+    @media(max-width:720px){ .options{grid-template-columns:1fr;} }
+
+    .opt{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:14px;
+      cursor:pointer;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      transition: background .15s, border-color .15s, transform .05s;
+      background: rgba(255,255,255,.02);
+      min-height:92px;
+    }
+    .opt:hover{
+      background: rgba(255,255,255,.05);
+      border-color: rgba(255,255,255,.16);
+      transform: translateY(-1px);
+    }
+
+    /* ✅ 改善案①：国旗（絵文字）専用フォント指定 */
+    .flag{
+      font-family:
+        "Segoe UI Emoji",        /* Windows */
+        "Apple Color Emoji",     /* macOS / iOS */
+        "Noto Color Emoji",      /* Android / Linux */
+        "Twemoji Mozilla",
+        system-ui,
+        sans-serif;
+      font-size:28px;
+      line-height:1;
+      opacity:0.85;             /* 大人向け：主張控えめ */
+      width:38px;
+      text-align:center;
+      flex: 0 0 38px;
+    }
+
+    .city{font-weight:700;}
+    .country{color:var(--muted); font-size:12px; margin-top:2px;}
+    .distanceLine{
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Noto Sans Mono", monospace;
+      letter-spacing: .02em;
+    }
+
+    .result{
+      margin-top:14px;
+      border-top:1px solid var(--line);
+      padding-top:12px;
+      font-size:13px;
+      line-height:1.7;
+      color:var(--muted);
+    }
+    .ok{color:var(--ok); font-weight:700;}
+    .ng{color:var(--ng); font-weight:700;}
+
+    .row{display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center; margin-top:12px;}
+    button{
+      padding:10px 14px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      font-size:14px;
+      cursor:pointer;
+      transition: background .15s, border-color .15s, transform .05s;
+    }
+    button:hover{background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.14);}
+    button:active{transform: translateY(1px);}
+    .pill{
+      font-size:12px;
+      color:var(--muted);
+      border:1px solid var(--line);
+      padding:6px 10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.03);
+    }
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>都市間距離クイズ（2モード）</h1>
+      <div class="sub">
+        「3つのうち最も近い都市」を選ぶクイズ。回答後は3択すべての距離を表示します。
+      </div>
+    </div>
+    <div class="pill" id="modePill">Mode: ロンドン固定</div>
+  </header>
+
+  <div class="card">
+    <div class="controls">
+      <div class="control">
+        <label for="modeSelect">出題モード</label>
+        <select id="modeSelect">
+          <option value="london">ロンドン起点（固定）</option>
+          <option value="random">出発地もランダム（毎問）</option>
+        </select>
+      </div>
+      <div class="control" style="min-width:240px;">
+        <label for="poolSelect">出題プール（簡易）</label>
+        <select id="poolSelect">
+          <option value="all">全都市（同梱）</option>
+          <option value="near">近距離寄り（西欧中心）</option>
+          <option value="north">北欧・アイスランド</option>
+          <option value="south">南欧</option>
+          <option value="east">中東欧・バルト</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <div class="result" id="result" style="display:none;"></div>
+
+    <div class="row">
+      <button id="nextBtn">次の問題</button>
+      <button id="resetBtn">表示リセット（同じ問題）</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===============================
+   1) データ（必要最低限の同梱）
+   =============================== */
+const allCities = [
+  /* =======================
+     UK（多め）
+     ======================= */
+  { city:"London", country:"United Kingdom", iso2:"GB", lat:51.51, lon:-0.13, region:"near" },
+  { city:"Manchester", country:"United Kingdom", iso2:"GB", lat:53.48, lon:-2.24, region:"near" },
+  { city:"Birmingham", country:"United Kingdom", iso2:"GB", lat:52.49, lon:-1.89, region:"near" },
+  { city:"Liverpool", country:"United Kingdom", iso2:"GB", lat:53.41, lon:-2.99, region:"near" },
+  { city:"Leeds", country:"United Kingdom", iso2:"GB", lat:53.80, lon:-1.55, region:"near" },
+  { city:"Edinburgh", country:"United Kingdom", iso2:"GB", lat:55.95, lon:-3.19, region:"near" },
+  { city:"Glasgow", country:"United Kingdom", iso2:"GB", lat:55.86, lon:-4.25, region:"near" },
+  { city:"Bristol", country:"United Kingdom", iso2:"GB", lat:51.45, lon:-2.59, region:"near" },
+
+  /* =======================
+     アイルランド
+     ======================= */
+  { city:"Dublin", country:"Ireland", iso2:"IE", lat:53.33, lon:-6.25, region:"near" },
+  { city:"Cork", country:"Ireland", iso2:"IE", lat:51.90, lon:-8.47, region:"near" },
+
+  /* =======================
+     フランス（多め）
+     ======================= */
+  { city:"Paris", country:"France", iso2:"FR", lat:48.85, lon:2.35, region:"near" },
+  { city:"Lyon", country:"France", iso2:"FR", lat:45.76, lon:4.83, region:"near" },
+  { city:"Marseille", country:"France", iso2:"FR", lat:43.30, lon:5.37, region:"south" },
+  { city:"Nice", country:"France", iso2:"FR", lat:43.70, lon:7.27, region:"south" },
+  { city:"Bordeaux", country:"France", iso2:"FR", lat:44.84, lon:-0.58, region:"near" },
+  { city:"Toulouse", country:"France", iso2:"FR", lat:43.60, lon:1.44, region:"near" },
+
+  /* =======================
+     ドイツ（多め）
+     ======================= */
+  { city:"Berlin", country:"Germany", iso2:"DE", lat:52.52, lon:13.41, region:"near" },
+  { city:"Hamburg", country:"Germany", iso2:"DE", lat:53.55, lon:9.99, region:"near" },
+  { city:"Munich", country:"Germany", iso2:"DE", lat:48.14, lon:11.58, region:"near" },
+  { city:"Frankfurt", country:"Germany", iso2:"DE", lat:50.11, lon:8.68, region:"near" },
+  { city:"Cologne", country:"Germany", iso2:"DE", lat:50.94, lon:6.96, region:"near" },
+  { city:"Stuttgart", country:"Germany", iso2:"DE", lat:48.78, lon:9.18, region:"near" },
+
+  /* =======================
+     ベネルクス
+     ======================= */
+  { city:"Brussels", country:"Belgium", iso2:"BE", lat:50.85, lon:4.35, region:"near" },
+  { city:"Antwerp", country:"Belgium", iso2:"BE", lat:51.22, lon:4.40, region:"near" },
+  { city:"Amsterdam", country:"Netherlands", iso2:"NL", lat:52.37, lon:4.89, region:"near" },
+  { city:"Rotterdam", country:"Netherlands", iso2:"NL", lat:51.92, lon:4.48, region:"near" },
+  { city:"Luxembourg", country:"Luxembourg", iso2:"LU", lat:49.61, lon:6.13, region:"near" },
+
+  /* =======================
+     イタリア（多め）
+     ======================= */
+  { city:"Rome", country:"Italy", iso2:"IT", lat:41.89, lon:12.51, region:"south" },
+  { city:"Milan", country:"Italy", iso2:"IT", lat:45.46, lon:9.19, region:"near" },
+  { city:"Venice", country:"Italy", iso2:"IT", lat:45.44, lon:12.33, region:"near" },
+  { city:"Florence", country:"Italy", iso2:"IT", lat:43.77, lon:11.25, region:"south" },
+  { city:"Naples", country:"Italy", iso2:"IT", lat:40.85, lon:14.27, region:"south" },
+  { city:"Turin", country:"Italy", iso2:"IT", lat:45.07, lon:7.69, region:"near" },
+
+  /* =======================
+     スペイン・ポルトガル
+     ======================= */
+  { city:"Madrid", country:"Spain", iso2:"ES", lat:40.42, lon:-3.70, region:"south" },
+  { city:"Barcelona", country:"Spain", iso2:"ES", lat:41.38, lon:2.17, region:"south" },
+  { city:"Valencia", country:"Spain", iso2:"ES", lat:39.47, lon:-0.38, region:"south" },
+  { city:"Seville", country:"Spain", iso2:"ES", lat:37.39, lon:-5.99, region:"south" },
+  { city:"Lisbon", country:"Portugal", iso2:"PT", lat:38.72, lon:-9.13, region:"south" },
+  { city:"Porto", country:"Portugal", iso2:"PT", lat:41.15, lon:-8.61, region:"south" },
+
+  /* =======================
+     北欧・アイスランド
+     ======================= */
+  { city:"Copenhagen", country:"Denmark", iso2:"DK", lat:55.68, lon:12.57, region:"north" },
+  { city:"Stockholm", country:"Sweden", iso2:"SE", lat:59.33, lon:18.06, region:"north" },
+  { city:"Oslo", country:"Norway", iso2:"NO", lat:59.91, lon:10.75, region:"north" },
+  { city:"Helsinki", country:"Finland", iso2:"FI", lat:60.17, lon:24.94, region:"north" },
+  { city:"Reykjavík", country:"Iceland", iso2:"IS", lat:64.14, lon:-21.90, region:"north" },
+
+  /* =======================
+     中東欧・バルト
+     ======================= */
+  { city:"Vienna", country:"Austria", iso2:"AT", lat:48.21, lon:16.37, region:"east" },
+  { city:"Prague", country:"Czechia", iso2:"CZ", lat:50.09, lon:14.42, region:"east" },
+  { city:"Budapest", country:"Hungary", iso2:"HU", lat:47.50, lon:19.04, region:"east" },
+  { city:"Warsaw", country:"Poland", iso2:"PL", lat:52.23, lon:21.01, region:"east" },
+  { city:"Krakow", country:"Poland", iso2:"PL", lat:50.06, lon:19.94, region:"east" },
+  { city:"Bucharest", country:"Romania", iso2:"RO", lat:44.43, lon:26.11, region:"east" },
+  { city:"Ljubljana", country:"Slovenia", iso2:"SI", lat:46.05, lon:14.51, region:"east" },
+  { city:"Zagreb", country:"Croatia", iso2:"HR", lat:45.81, lon:15.98, region:"east" },
+  { city:"Riga", country:"Latvia", iso2:"LV", lat:56.95, lon:24.11, region:"east" },
+  { city:"Tallinn", country:"Estonia", iso2:"EE", lat:59.44, lon:24.75, region:"east" },
+  { city:"Vilnius", country:"Lithuania", iso2:"LT", lat:54.69, lon:25.28, region:"east" },
+
+  /* =======================
+     ギリシャ
+     ======================= */
+  { city:"Athens", country:"Greece", iso2:"GR", lat:37.98, lon:23.72, region:"south" },
+  { city:"Thessaloniki", country:"Greece", iso2:"GR", lat:40.64, lon:22.94, region:"south" }
+];
+
+
+const LONDON = allCities.find(c => c.city === "London");
+
+/* ===============================
+   2) 国旗表示（改善案①②）
+   =============================== */
+function iso2ToFlag(iso2){
+  if(!iso2 || iso2.length !== 2) return "🏳️";
+  const code = iso2.toUpperCase();
+  const A = 0x1F1E6;
+  try{
+    return String.fromCodePoint(
+      A + (code.charCodeAt(0) - 65),
+      A + (code.charCodeAt(1) - 65)
+    );
+  }catch{
+    return "🏳️";
+  }
+}
+
+// ✅ 改善案②：絵文字不可なら [ISO2] にフォールバック
+function flagOrCode(iso2){
+  const flag = iso2ToFlag(iso2);
+  if (!flag || flag === "🏳️") return "[" + (iso2||"").toUpperCase() + "]";
+  return flag;
+}
+
+/* ===============================
+   3) 距離（Haversine）
+   =============================== */
+function haversineKm(a, b){
+  const R = 6371;
+  const toRad = d => d * Math.PI / 180;
+  const dLat = toRad(b.lat - a.lat);
+  const dLon = toRad(b.lon - a.lon);
+
+  const x =
+    Math.sin(dLat/2)**2 +
+    Math.cos(toRad(a.lat)) *
+    Math.cos(toRad(b.lat)) *
+    Math.sin(dLon/2)**2;
+
+  return 2 * R * Math.asin(Math.sqrt(x));
+}
+
+/* ===============================
+   4) UI / Quiz
+   =============================== */
+const modeSelect = document.getElementById("modeSelect");
+const poolSelect = document.getElementById("poolSelect");
+const modePill   = document.getElementById("modePill");
+const questionEl = document.getElementById("question");
+const optionsEl  = document.getElementById("options");
+const resultEl   = document.getElementById("result");
+const nextBtn    = document.getElementById("nextBtn");
+const resetBtn   = document.getElementById("resetBtn");
+
+let current = null; // { origin, picks[], distances[], correctIndex, answered }
+let lastRandomOriginKey = null;
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function getPool(){
+  const p = poolSelect.value;
+  if (p === "all") return allCities;
+  // London は常に含めておく（ランダム起点での体験が安定）
+  const filtered = allCities.filter(c => c.region === p || c.city === "London");
+  return filtered.length >= 6 ? filtered : allCities;
+}
+
+function pickRandomOrigin(pool){
+  // poolからランダムに選ぶ（連続同一をなるべく避ける）
+  const candidates = pool.slice();
+  const shuffled = shuffle(candidates);
+
+  // lastRandomOriginKey を避けられるなら避ける
+  for (const c of shuffled){
+    const key = c.city + "|" + c.country;
+    if (key !== lastRandomOriginKey) {
+      lastRandomOriginKey = key;
+      return c;
+    }
+  }
+  // 全部同じになることは基本ないが保険
+  const chosen = shuffled[0] || LONDON;
+  lastRandomOriginKey = chosen.city + "|" + chosen.country;
+  return chosen;
+}
+
+function modeLabel(){
+  return modeSelect.value === "london" ? "Mode: ロンドン固定" : "Mode: 出発地ランダム";
+}
+
+function newQuestion(){
+  resultEl.style.display = "none";
+  resultEl.innerHTML = "";
+  optionsEl.innerHTML = "";
+
+  const pool = getPool();
+
+  // 起点（モード切替）
+  const origin = (modeSelect.value === "london")
+    ? LONDON
+    : pickRandomOrigin(pool);
+
+  // 3択候補（起点と同一都市は除外：ゼロ距離問題を防ぐ）
+  const candidates = pool.filter(c => !(c.city === origin.city && c.country === origin.country));
+  const picks = shuffle(candidates).slice(0, 3);
+
+  // 念のため、足りない場合はallCitiesから補填
+  const unique = [];
+  for (const p of picks){
+    if (!unique.some(u => u.city === p.city && u.country === p.country)) unique.push(p);
+  }
+  while (unique.length < 3){
+    const extraPool = allCities.filter(c => !(c.city === origin.city && c.country === origin.country));
+    const extra = extraPool[Math.floor(Math.random()*extraPool.length)];
+    if (!unique.some(u => u.city === extra.city && u.country === extra.country)) unique.push(extra);
+  }
+
+  const distances = unique.map(c => haversineKm(origin, c));
+  const min = Math.min(...distances);
+  const correctIndex = distances.indexOf(min);
+
+  current = { origin, picks: unique, distances, correctIndex, answered:false };
+
+  modePill.textContent = modeLabel();
+  questionEl.innerHTML =
+    `出発：<span class="badge">${flagOrCode(origin.iso2)} ${origin.city}</span> から、<span class="badge">いちばん近い</span>都市はどれ？`;
+
+  renderOptionsBeforeAnswer();
+}
+
+function renderOptionsBeforeAnswer(){
+  const { picks } = current;
+  optionsEl.innerHTML = "";
+
+  picks.forEach((c, i) => {
+    const el = document.createElement("div");
+    el.className = "opt";
+    el.setAttribute("role","button");
+    el.tabIndex = 0;
+
+    const flag = document.createElement("div");
+    flag.className = "flag";
+    flag.textContent = flagOrCode(c.iso2);
+
+    const text = document.createElement("div");
+    text.innerHTML = `
+      <div class="city">${c.city}</div>
+      <div class="country">${c.country}</div>
+    `;
+
+    el.appendChild(flag);
+    el.appendChild(text);
+    el.addEventListener("click", () => answer(i));
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); answer(i); }
+    });
+
+    optionsEl.appendChild(el);
+  });
+}
+
+/* ✅ 回答後：3択すべてに距離を表示（ユーザー要望） */
+function renderOptionsAfterAnswer(chosenIndex){
+  const { picks, distances, correctIndex } = current;
+  optionsEl.innerHTML = "";
+
+  picks.forEach((c, i) => {
+    const el = document.createElement("div");
+    el.className = "opt";
+    el.style.cursor = "default";
+
+    // 控えめな強調（大人向け）
+    if (i === correctIndex) {
+      el.style.borderColor = "rgba(52,211,153,.60)";
+      el.style.background  = "rgba(52,211,153,.08)";
+    } else if (i === chosenIndex) {
+      el.style.borderColor = "rgba(251,113,133,.52)";
+      el.style.background  = "rgba(251,113,133,.06)";
+    } else {
+      el.style.borderColor = "rgba(255,255,255,.12)";
+      el.style.background  = "rgba(255,255,255,.03)";
+    }
+
+    const flag = document.createElement("div");
+    flag.className = "flag";
+    flag.textContent = flagOrCode(c.iso2);
+
+    const text = document.createElement("div");
+    text.innerHTML = `
+      <div class="city">${c.city}</div>
+      <div class="country">${c.country}</div>
+      <div class="distanceLine">距離：約 ${distances[i].toFixed(0)} km</div>
+    `;
+
+    el.appendChild(flag);
+    el.appendChild(text);
+    optionsEl.appendChild(el);
+  });
+}
+
+function answer(i){
+  if (!current || current.answered) return;
+  current.answered = true;
+
+  const { origin, picks, distances, correctIndex } = current;
+  const correct = picks[correctIndex];
+
+  resultEl.style.display = "block";
+
+  if (i === correctIndex){
+    resultEl.innerHTML =
+      `<span class="ok">正解</span>：${flagOrCode(correct.iso2)} ${correct.city}（約 ${distances[i].toFixed(0)} km）<br>` +
+      `出発：${flagOrCode(origin.iso2)} ${origin.city}`;
+  } else {
+    resultEl.innerHTML =
+      `<span class="ng">不正解</span>。正解は ${flagOrCode(correct.iso2)} ${correct.city}（約 ${distances[correctIndex].toFixed(0)} km）<br>` +
+      `出発：${flagOrCode(origin.iso2)} ${origin.city}`;
+  }
+
+  // ✅ 回答後に3択すべての距離を表示
+  renderOptionsAfterAnswer(i);
+}
+
+/* ===============================
+   5) Events
+   =============================== */
+nextBtn.addEventListener("click", newQuestion);
+
+// 「表示リセット」は同じ問題のまま回答前表示に戻す（大人向け：議論中に便利）
+resetBtn.addEventListener("click", () => {
+  if(!current) return;
+  current.answered = false;
+  resultEl.style.display = "none";
+  resultEl.innerHTML = "";
+  renderOptionsBeforeAnswer();
+});
+
+modeSelect.addEventListener("change", newQuestion);
+poolSelect.addEventListener("change", newQuestion);
+
+// 初期表示
+newQuestion();
+</script>
+</body>
+</html>
