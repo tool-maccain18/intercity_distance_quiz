@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>都市間距離クイズ（2モード）</title>
+  <title>都市間距離クイズ　ヨーロッパ編</title>
 
   <style>
     :root{
@@ -154,9 +154,9 @@
 <div class="wrap">
   <header>
     <div>
-      <h1>都市間距離クイズ（2モード）</h1>
+      <h1>都市間距離クイズ　ヨーロッパ編</h1>
       <div class="sub">
-        「3つのうち最も近い都市」を選ぶクイズ。回答後は3択すべての距離を表示します。
+        「3つのうち最も近い都市」を選ぶクイズ。距離ベースで選択してください。（スマートフォン推奨）
       </div>
     </div>
     <div class="pill" id="modePill">Mode: ロンドン固定</div>
@@ -174,7 +174,7 @@
       <div class="control" style="min-width:240px;">
         <label for="poolSelect">出題プール（簡易）</label>
         <select id="poolSelect">
-          <option value="all">全都市（同梱）</option>
+          <option value="all">全都市</option>
           <option value="near">近距離寄り（西欧中心）</option>
           <option value="north">北欧・アイスランド</option>
           <option value="south">南欧</option>
@@ -452,7 +452,7 @@ function newQuestion(){
 
   modePill.textContent = modeLabel();
   questionEl.innerHTML =
-    `出発：<span class="badge">${flagOrCode(origin.iso2)} ${origin.city}</span> から、<span class="badge">いちばん近い</span>都市はどれ？`;
+    `出発：<span class="badge">${flagOrCode(origin.iso2)} ${origin.city}</span> から、いちばん近い都市はどれ？`;
 
   renderOptionsBeforeAnswer();
 }
