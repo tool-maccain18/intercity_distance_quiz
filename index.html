@@ -224,18 +224,19 @@ const allCities = [
   { city:"Lyon", country:"France", iso2:"FR", lat:45.76, lon:4.83, region:"near" },
   { city:"Marseille", country:"France", iso2:"FR", lat:43.30, lon:5.37, region:"south" },
   { city:"Nice", country:"France", iso2:"FR", lat:43.70, lon:7.27, region:"south" },
-  { city:"Bordeaux", country:"France", iso2:"FR", lat:44.84, lon:-0.58, region:"near" },
-  { city:"Toulouse", country:"France", iso2:"FR", lat:43.60, lon:1.44, region:"near" },
+  { city:"Monaco", country:"Monaco", iso2:"MC", lat:43.74, lon:7.42, region:"south", ja:"モナコ" },
+  { city:"Bordeaux", country:"France", iso2:"FR", lat:44.84, lon:-0.58, region:"near", ja:"ボルドー" },
+  { city:"Toulouse", country:"France", iso2:"FR", lat:43.60, lon:1.44, region:"near", ja:"トゥールーズ" },
 
   /* =======================
      ドイツ（多め）
      ======================= */
   { city:"Berlin", country:"Germany", iso2:"DE", lat:52.52, lon:13.41, region:"near" },
   { city:"Hamburg", country:"Germany", iso2:"DE", lat:53.55, lon:9.99, region:"near" },
-  { city:"Munich", country:"Germany", iso2:"DE", lat:48.14, lon:11.58, region:"near" },
+  { city:"Munich", country:"Germany", iso2:"DE", lat:48.14, lon:11.58, region:"near", ja:"ミュンヘン" },
   { city:"Frankfurt", country:"Germany", iso2:"DE", lat:50.11, lon:8.68, region:"near" },
-  { city:"Cologne", country:"Germany", iso2:"DE", lat:50.94, lon:6.96, region:"near" },
-  { city:"Stuttgart", country:"Germany", iso2:"DE", lat:48.78, lon:9.18, region:"near" },
+  { city:"Cologne", country:"Germany", iso2:"DE", lat:50.94, lon:6.96, region:"near", ja:"ケルン" },
+  { city:"Stuttgart", country:"Germany", iso2:"DE", lat:48.78, lon:9.18, region:"near", ja:"シュトゥットガルト" },
 
   /* =======================
      ベネルクス
@@ -245,6 +246,9 @@ const allCities = [
   { city:"Amsterdam", country:"Netherlands", iso2:"NL", lat:52.37, lon:4.89, region:"near" },
   { city:"Rotterdam", country:"Netherlands", iso2:"NL", lat:51.92, lon:4.48, region:"near" },
   { city:"Luxembourg", country:"Luxembourg", iso2:"LU", lat:49.61, lon:6.13, region:"near" },
+  { city:"Zurich", country:"Switzerland", iso2:"CH", lat:47.38, lon:8.54, region:"near", ja:"チューリッヒ" },
+  { city:"Geneva", country:"Switzerland", iso2:"CH", lat:46.20, lon:6.15, region:"near", ja:"ジュネーブ" },
+
 
   /* =======================
      イタリア（多め）
@@ -255,6 +259,7 @@ const allCities = [
   { city:"Florence", country:"Italy", iso2:"IT", lat:43.77, lon:11.25, region:"south" },
   { city:"Naples", country:"Italy", iso2:"IT", lat:40.85, lon:14.27, region:"south" },
   { city:"Turin", country:"Italy", iso2:"IT", lat:45.07, lon:7.69, region:"near" },
+  { city:"Valletta", country:"Malta", iso2:"MT", lat:35.90, lon:14.51, region:"south", ja:"バレッタ" },
 
   /* =======================
      スペイン・ポルトガル
@@ -265,6 +270,7 @@ const allCities = [
   { city:"Seville", country:"Spain", iso2:"ES", lat:37.39, lon:-5.99, region:"south" },
   { city:"Lisbon", country:"Portugal", iso2:"PT", lat:38.72, lon:-9.13, region:"south" },
   { city:"Porto", country:"Portugal", iso2:"PT", lat:41.15, lon:-8.61, region:"south" },
+  { city:"Las Palmas", country:"Spain", iso2:"ES", lat:28.12, lon:-15.43, region:"south", ja:"ラス・パルマス" },
 
   /* =======================
      北欧・アイスランド
@@ -278,17 +284,23 @@ const allCities = [
   /* =======================
      中東欧・バルト
      ======================= */
-  { city:"Vienna", country:"Austria", iso2:"AT", lat:48.21, lon:16.37, region:"east" },
-  { city:"Prague", country:"Czechia", iso2:"CZ", lat:50.09, lon:14.42, region:"east" },
+  { city:"Vienna", country:"Austria", iso2:"AT", lat:48.21, lon:16.37, region:"east", ja:"ウィーン" },
+　{ city:"Prague", country:"Czechia", iso2:"CZ", lat:50.09, lon:14.42, region:"east", ja:"プラハ" },
   { city:"Budapest", country:"Hungary", iso2:"HU", lat:47.50, lon:19.04, region:"east" },
   { city:"Warsaw", country:"Poland", iso2:"PL", lat:52.23, lon:21.01, region:"east" },
-  { city:"Krakow", country:"Poland", iso2:"PL", lat:50.06, lon:19.94, region:"east" },
+　{ city:"Krakow", country:"Poland", iso2:"PL", lat:50.06, lon:19.94, region:"east", ja:"クラクフ" },
   { city:"Bucharest", country:"Romania", iso2:"RO", lat:44.43, lon:26.11, region:"east" },
-  { city:"Ljubljana", country:"Slovenia", iso2:"SI", lat:46.05, lon:14.51, region:"east" },
+　{ city:"Ljubljana", country:"Slovenia", iso2:"SI", lat:46.05, lon:14.51, region:"east", ja:"リュブリャナ" },
   { city:"Zagreb", country:"Croatia", iso2:"HR", lat:45.81, lon:15.98, region:"east" },
   { city:"Riga", country:"Latvia", iso2:"LV", lat:56.95, lon:24.11, region:"east" },
   { city:"Tallinn", country:"Estonia", iso2:"EE", lat:59.44, lon:24.75, region:"east" },
   { city:"Vilnius", country:"Lithuania", iso2:"LT", lat:54.69, lon:25.28, region:"east" },
+  { city:"Bratislava", country:"Slovakia", iso2:"SK", lat:48.15, lon:17.11, region:"east", ja:"ブラチスラバ" },
+  { city:"Belgrade", country:"Serbia", iso2:"RS", lat:44.79, lon:20.45, region:"east", ja:"ベオグラード" },
+  { city:"Sofia", country:"Bulgaria", iso2:"BG", lat:42.70, lon:23.32, region:"east", ja:"ソフィア" },
+  { city:"Sarajevo", country:"Bosnia and Herzegovina", iso2:"BA", lat:43.86, lon:18.41, region:"east", ja:"サラエボ" },
+  { city:"Skopje", country:"North Macedonia", iso2:"MK", lat:41.99, lon:21.43, region:"east", ja:"スコピエ" },
+
 
   /* =======================
      ギリシャ
@@ -323,6 +335,14 @@ function flagOrCode(iso2){
   if (!flag || flag === "🏳️") return "[" + (iso2||"").toUpperCase() + "]";
   return flag;
 }
+
+function displayCity(c){
+  if (c.ja) {
+    return `${c.city}（${c.ja}）`;
+  }
+  return c.city;
+}
+
 
 /* ===============================
    3) 距離（Haversine）
@@ -496,7 +516,7 @@ function renderOptionsAfterAnswer(chosenIndex){
 
     const text = document.createElement("div");
     text.innerHTML = `
-      <div class="city">${c.city}</div>
+      <div class="city">${displayCity(c)}</div>
       <div class="country">${c.country}</div>
       <div class="distanceLine">距離：約 ${distances[i].toFixed(0)} km</div>
     `;
@@ -518,7 +538,7 @@ function answer(i){
 
   if (i === correctIndex){
     resultEl.innerHTML =
-      `<span class="ok">正解</span>：${flagOrCode(correct.iso2)} ${correct.city}（約 ${distances[i].toFixed(0)} km）<br>` +
+      `<span class="ok">正解</span>：${flagOrCode(correct.iso2)} ${flagOrCode(correct.iso2)} ${displayCity(correct)}（約 ${distances[i].toFixed(0)} km）<br>` +
       `出発：${flagOrCode(origin.iso2)} ${origin.city}`;
   } else {
     resultEl.innerHTML =
